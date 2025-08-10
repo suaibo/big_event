@@ -1,13 +1,12 @@
 package com.suai.library.book.service;
 
 import com.suai.library.book.model.entity.Book;
-import com.suai.library.pojo.dto.PageReqDto;
-import com.suai.library.pojo.dto.PageRespDto;
+import com.suai.library.book.model.vo.PageVo;
 
 public interface BookService {
 
     //模糊查询通过作者或书名
-    PageRespDto<Book> findByAuthor(String keyword, PageReqDto pageReqDto);
+    PageVo<Book> findByAuthor(String keyword, PageVo pageReqDto);
 
 
     void addBook(Book book);
