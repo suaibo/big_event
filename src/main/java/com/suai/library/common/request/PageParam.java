@@ -1,4 +1,4 @@
-package com.suai.library.book.model.request;
+package com.suai.library.common.request;
 
 import lombok.Data;
 
@@ -8,5 +8,4 @@ public class PageParam {
     private int pageNum = 1;
     //默认十
     private int pageSize = 10;
-
 }

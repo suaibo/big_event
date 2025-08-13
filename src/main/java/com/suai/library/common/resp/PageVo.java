@@ -1,4 +1,4 @@
-package com.suai.library.book.model.vo;
+package com.suai.library.common.resp;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,7 +13,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PageVo<T>{
+public class PageVo<T> {
     //总数
     private long total;
     //当前页集合
