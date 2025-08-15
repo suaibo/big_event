@@ -18,7 +18,12 @@ public class UserServiceImpl implements UserService {
         //加密密码
         String encryptedPassword = PasswordUtils.encodePassword(password);
         //注册进入数据库
-        userMapper.register(username,encryptedPassword);
+        userMapper.register(username,encryptedPassword,"user");
+    }
+
+    public void registerAdmin(String username, String password) {
+        String encryptedPassword = PasswordUtils.encodePassword(password);
+        userMapper.register(username, encryptedPassword, "admin");
     }
 
     @Override
@@ -30,4 +35,6 @@ public class UserServiceImpl implements UserService {
     public void updateUserBaseInfo(User user) {
         userMapper.updateUserBaseInfo(user);
     }
+
+
 }

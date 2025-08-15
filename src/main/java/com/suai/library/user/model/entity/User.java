@@ -21,4 +21,6 @@ public class User {
     private String userPic;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
+    //角色
+    private String role = "user";
 }

@@ -11,6 +11,7 @@ public class BookConvert {
 
     public static BookVo toVo(Book book) {
         BookVo bookVo = new BookVo();
+        bookVo.setId(book.getId());
         bookVo.setIsbn(book.getIsbn());
         bookVo.setTitle(book.getTitle());
         bookVo.setAuthor(book.getAuthor());

@@ -1,5 +1,6 @@
 package com.suai.library.common.config;
 
+import cn.dev33.satoken.interceptor.SaInterceptor;
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;

@@ -3,9 +3,11 @@ package com.suai.library;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @SpringBootApplication
-@MapperScan("com.suai.mapper")
+@MapperScan("com.suai.library.*.repository")
+@EnableTransactionManagement
 public class BigEventApplication {
 
     public static void main(String[] args) {

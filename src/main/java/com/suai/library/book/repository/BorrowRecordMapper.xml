@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace 必须指向 Mapper 接口全限定名 -->
+<mapper namespace="com.suai.library.book.repository.BorrowRecordMapper">
+
+    <!-- 结果映射：把联表查询的列一次性封装到 VO -->
+    <resultMap id="BorrowBookRecordVoMap"
+               type="com.suai.library.book.model.vo.BorrowBookRecordVo">
+        <id     column="id"         property="id"/>
+        <result column="borrow_time" property="borrowTime"/>
+        <result column="return_time" property="returnTime"/>
+        <result column="deadline"    property="deadline"/>
+        <result column="title"       property="title"/>
+        <result column="author"      property="author"/>
+        <result column="isbn"        property="isbn"/>
+    </resultMap>
+
+    <!-- 模糊查询 + 联表 -->
+    <select id="searchBorrowByKeyword"
+            resultMap="BorrowBookRecordVoMap">
+        SELECT br.id,
+               br.borrow_time,
+               br.return_time,
+               br.deadline,
+               b.id      AS book_id,
+               b.title,
+               b.author,
+               b.isbn
+        FROM borrow_book_record br
+                 JOIN book b ON br.book_id = b.id
+        WHERE br.user_id = #{userId}
+          AND (
+            b.title  LIKE CONCAT('%', #{keyword}, '%')
+                OR b.author LIKE CONCAT('%', #{keyword}, '%')
+                OR b.isbn   LIKE CONCAT('%', #{keyword}, '%')
+            )
+        ORDER BY br.borrow_time DESC
+    </select>
+
+    <!-- 单行悲观锁 -->
+    <select id="selectByIdForUpdate"
+            resultType="com.suai.library.book.model.entity.BorrowBookRecord">
+        SELECT * FROM borrow_record WHERE id = #{id} FOR UPDATE
+    </select>
+
+</mapper>
