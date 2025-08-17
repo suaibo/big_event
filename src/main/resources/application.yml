@@ -21,3 +21,12 @@ spring:
 mybatis:
   configuration:
     map-underscore-to-camel-case: true
+sa-token:
+  token-name: Authorization
+  timeout: 3600
+  is-share: true
+  is-read-header: true
+  is-read-body: false
+  is-read-cookie: false
+  token-style: simple-uuid
+  active-timeout: 1800
