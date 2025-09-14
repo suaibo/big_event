@@ -1,14 +1,19 @@
 package com.suai.library.user.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.bean.copier.CopyOptions;
 import com.suai.library.common.resp.Result;
 import com.suai.library.common.utils.JwtUtil;
 import com.suai.library.common.utils.PasswordUtils;
+import com.suai.library.user.model.dto.UserDto;
 import com.suai.library.user.model.entity.User;
 import com.suai.library.user.service.UserService;
 import jakarta.validation.constraints.Pattern;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,7 +30,7 @@ public class UserController {
     private UserService userService;
 
     @Autowired
-    private RedisTemplate redisTemplate;
+    private StringRedisTemplate stringRedisTemplate;
 
     @PostMapping("/register")
     public Result register(@Pattern(regexp = "^\\S{5,16}$") String username, @Pattern(regexp = "^\\S{5,16}$") String password) {
@@ -78,7 +83,11 @@ public class UserController {
             String token = JwtUtil.genToken(claims);
 
             // 存入Redis
-            redisTemplate.opsForValue().set(token, token, 1, TimeUnit.HOURS);
+            stringRedisTemplate.opsForValue().set(token, token, 30, TimeUnit.MINUTES);
+            UserDto userDto = BeanUtil.copyProperties(user, UserDto.class);
+            Map<String, Object> stringObjectMap = BeanUtil.beanToMap(userDto, new HashMap<>(), CopyOptions.create()
+                    .setFieldValueEditor(((fieldName, fieldValue) -> fieldValue.toString())));
+            stringRedisTemplate.opsForHash().putAll(token,stringObjectMap);
             return Result.success(token);
         }
         return Result.error("密码错误");

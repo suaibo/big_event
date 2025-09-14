@@ -3,11 +3,12 @@ package com.suai.library.book.controller;
 import cn.dev33.satoken.annotation.SaCheckRole;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.yulichang.wrapper.interfaces.SelectWrapper;
 import com.suai.library.book.converter.BookConvert;
-import com.suai.library.book.converter.BorrowConvert;
 import com.suai.library.book.model.entity.Book;
 import com.suai.library.book.model.entity.BorrowBookRecord;
 import com.suai.library.book.model.request.BookBorrowingParam;
@@ -48,31 +49,6 @@ public class BookController {
         }
         return Result.error("操作失败");
     }
-    //分页模糊查询
-    @GetMapping("/page_book")
-    public Result<BookPageVo> fuzzyQuery(BookPageParam param) {
-        IPage<Book> iPage = new Page<>(param.getPageNum(), param.getPageSize());
-        //wrapper实现模糊查询
-        LambdaQueryWrapper<Book> wrapper = new LambdaQueryWrapper<Book>()
-                        .select(Book::getIsbn, Book::getTitle, Book::getAuthor)
-                .and(i->i.like(Book::getAuthor,param.getKeyword())
-                        .or()
-                        .like(Book::getTitle,param.getKeyword())
-                        .or()
-                        .like(Book::getPublisher,param.getKeyword())
-                        .or()
-                        .like(Book::getIsbn,param.getKeyword()));
-        //查询操作
-        IPage<Book> page = bookService.page(iPage, wrapper);
-        List<Book> records = page.getRecords();
-        BookPageVo bookPageVo = new BookPageVo();
-        List<BookVo> voList = BookConvert.toVoList(records);
-        bookPageVo.setList(voList);
-        bookPageVo.setTotal(page.getTotal());
-        //封装返回
-        return Result.success(bookPageVo);
-    }
-
     //更新图书，管理员操作
     @PutMapping("manager")
     @SaCheckRole("admin")
@@ -109,7 +85,43 @@ public class BookController {
         }
         return Result.error("图书不存在");
     }
-//借阅操作
+
+    //分页模糊查询
+    @GetMapping("/page_book")
+    public Result<BookPageVo> fuzzyQuery(BookPageParam param) {
+        IPage<Book> iPage = new Page<>(param.getPageNum(), param.getPageSize());
+        //wrapper实现模糊查询
+        LambdaQueryWrapper<Book> wrapper = new LambdaQueryWrapper<Book>()
+                .select(Book::getIsbn, Book::getTitle, Book::getAuthor)
+                .and(i->i.like(Book::getAuthor,param.getKeyword())
+                        .or()
+                        .like(Book::getTitle,param.getKeyword())
+                        .or()
+                        .like(Book::getPublisher,param.getKeyword())
+                        .or()
+                        .like(Book::getIsbn,param.getKeyword()));
+        //查询操作
+        IPage<Book> page = bookService.page(iPage, wrapper);
+        List<Book> records = page.getRecords();
+        BookPageVo bookPageVo = new BookPageVo();
+        List<BookVo> voList = BookConvert.toVoList(records);
+        bookPageVo.setList(voList);
+        bookPageVo.setTotal(page.getTotal());
+        //封装返回
+        return Result.success(bookPageVo);
+    }
+
+    //查询图书
+    @GetMapping("book")
+    public Result<BookVo> selectBook(@RequestParam Integer id) {
+        BookVo bookVo = bookService.queryById(id);
+        if(bookVo != null) {
+            return Result.success(bookVo);
+        }
+        return Result.error("图书不存在");
+    }
+
+    //借阅操作
     @PutMapping("/borrow")
     public Result borrowBook(@RequestBody BookBorrowingParam bookBorrowParam) {
         boolean flag = bookService.borrowBook(bookBorrowParam);

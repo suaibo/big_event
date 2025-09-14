@@ -1,31 +1,34 @@
 package com.suai.library.common.interceptors;
 
 import com.suai.library.common.utils.JwtUtil;
+import com.suai.library.common.utils.UserHolder;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Component;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
-@Component
 public class LoginInterceptor implements HandlerInterceptor {
-    
-    @Autowired
-    private RedisTemplate redisTemplate;
-    
+
+    private StringRedisTemplate stringRedisTemplate;
+
+    public LoginInterceptor(StringRedisTemplate stringRedisTemplate) {
+        this.stringRedisTemplate = stringRedisTemplate;
+    }
+
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        HandlerInterceptor.super.afterCompletion(request, response, handler, ex);
+    }
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        String token = request.getHeader("Authorization");
         try {
-            String redisToken = (String) redisTemplate.opsForValue().get(token);
-            if (redisToken == null) {
+            if (UserHolder.getUser() == null) {
                 throw new RuntimeException();
             }
-            Map<String, Object> stringObjectMap = JwtUtil.verifyToken(token);
-            //放行
             return true;
         } catch (Exception e) {
             response.setStatus(401);
